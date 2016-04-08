@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { Merp } from './components'
+import { TestTButtons } from './components'
 
 export default class App extends React.Component {
   render() {
@@ -13,7 +13,7 @@ export default class App extends React.Component {
             </div>
           </nav>
           <div className="container">
-            <Merp />
+            <TestTButtons />
           </div>
         </body>
       </div>

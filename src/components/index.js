@@ -1,3 +1,3 @@
-import Merp from './Merp'
+import TestTButtons from './TestTButtons'
 
-export { Merp }
+export { TestTButtons }
