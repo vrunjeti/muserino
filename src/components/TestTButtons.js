@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import request from 'superagent'
 
-let T
+let T = window.T
 
 export default class TestTButtons extends React.Component {
 
@@ -19,9 +19,9 @@ export default class TestTButtons extends React.Component {
     // React components load faster than scripts in the window,
     // so this waits to set T, the reference to Timbre
     setTimeout(() => {
-      console.log(window.T)
+      // console.log(window.T)
       T = window.T
-    }, 700)
+    }, 300)
   }
 
   /**
@@ -63,32 +63,20 @@ export default class TestTButtons extends React.Component {
   }
 
   playDrums() {
-    console.log(window.T)
-    T('audio').loadthis('../sounds/drum.wav', function() {
-      console.log('loaded')
-      var BD  = this.slice(   0,  500).set({bang:false});
-      var ksfsbkfl  = this.slice(   0,  500).set({bang:true});
-      var SD  = this.slice( 500, 1000).set({bang:false});
-      var HH1 = this.slice(1000, 1500).set({bang:false, mul:0.2});
-      var HH2 = this.slice(1500, 2000).set({bang:false, mul:0.2});
-      var CYM = this.slice(2000).set({bang:false, mul:0.2});
-      // var scale = new sc.Scale([0,1,3,7,8], 12, "Pelog");
+    const drumSetAudioFiles = [
+      '../sounds/bass-drum.wav',
+      '../sounds/hi-hat-closed.wav',
+      '../sounds/hi-hat-open.wav',
+      '../sounds/snare1.wav',
+      '../sounds/ride.wav'
+    ]
+    const promises = drumSetAudioFiles.map(file => T('audio').loadthis(file))
+    Promise.all(promises).then(res => {
+      const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = res
+      hiHatOpen.play()
 
-      // var P1 = [
-      //   [BD, HH1],
-      //   [HH1],
-      //   [HH2],
-      //   [],
-      //   [BD, SD, HH1],
-      //   [HH1],
-      //   [HH2],
-      //   [SD]
-      // ]
-      // .wrapExtend(128);
-
-      // var P2 = sc.series(16);
-
-      var drum = T("lowshelf", {freq:110, gain:8, mul:0.6}, BD, SD, HH1, HH2, CYM).play();
+    }).catch(err => {
+      console.log('err', err)
     })
   }
 
