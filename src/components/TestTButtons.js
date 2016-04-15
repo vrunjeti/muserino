@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import request from 'superagent'
+import Timeline from './Timeline'
 
 let T = window.T
 
@@ -130,13 +131,21 @@ export default class TestTButtons extends React.Component {
     const timeOut = 60/tempo * 1000
     let loopPlayCount = 2
 
-    playMeasure(sampleDrumMeasure, drumSetArr, timeOut)
+    playDrumMeasure(sampleDrumMeasure, drumSetArr, timeOut)
     const interval = setInterval(() => {
       if (loopPlayCount === loopCount) clearInterval(interval)
-      playMeasure(sampleDrumMeasure, drumSetArr, timeOut)
+      playDrumMeasure(sampleDrumMeasure, drumSetArr, timeOut)
       loopPlayCount++
     }, timeOut * sampleDrumMeasure.length)
 
+  }
+
+  bangA4() {
+    const { tArr } = this.state
+    if (!tArr) return
+
+    console.log(tArr)
+    tArr[0].bang()
   }
 
   render() {
@@ -160,14 +169,21 @@ export default class TestTButtons extends React.Component {
           <button className="btn" onClick={this.playDrums.bind(this)}>Drums</button>
           <button className="btn" onClick={this.stopDrums.bind(this)}>Stop Drums</button>
           <button className="btn" onClick={this.playDrumBeat.bind(this)}>Drum Beat</button>
+          <button className="btn" onClick={this.bangA4.bind(this)}>Bang A4</button>
         </div>
+        <Timeline />
       </div>
     )
   }
 }
 
+// wiki midi tuning standard
+function convertMidiToFreq(midiNoteNumber) {
+  const A4 = 440
+  return Math.pow(2, (midiNoteNumber - 69)/12) * A4
+}
 
-function playMeasure(measure, instrument, timeOut) {
+function playDrumMeasure(measure, instrument, timeOut) {
   measure.forEach((count, index) => {
     setTimeout(() => {
       for (let notes of count) {
