@@ -21,6 +21,11 @@ export default class TestTButtons extends React.Component {
     setTimeout(() => {
       // console.log(window.T)
       T = window.T
+
+      const { drumSet } = this.state
+      if (!drumSet) {
+        this.loadDrums()
+      }
     }, 300)
   }
 
@@ -63,6 +68,24 @@ export default class TestTButtons extends React.Component {
   }
 
   playDrums() {
+    const { drumSet } = this.state
+    if (!drumSet) return
+    const { bassDrum, hiHatClosed, hiHatOpen, snare, ride } = drumSet
+
+    // play with .bang()
+    hiHatOpen.bang()
+  }
+
+  stopDrums() {
+    const { drumSet } = this.state
+    if (!drumSet) return
+    const { bassDrum, hiHatClosed, hiHatOpen, snare, ride } = drumSet
+
+    // pause with .pause()
+    hiHatOpen.pause()
+  }
+
+  loadDrums() {
     const drumSetAudioFiles = [
       '../sounds/bass-drum.wav',
       '../sounds/hi-hat-closed.wav',
@@ -70,11 +93,23 @@ export default class TestTButtons extends React.Component {
       '../sounds/snare1.wav',
       '../sounds/ride.wav'
     ]
+
     const promises = drumSetAudioFiles.map(file => T('audio').loadthis(file))
+
     Promise.all(promises).then(res => {
       const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = res
-      hiHatOpen.play()
 
+      // TODO: find out a way to make it play() so it starts, 
+      // but not actually produce sound
+      const drumSet = {
+        bassDrum: bassDrum.play(),
+        hiHatClosed: hiHatClosed.play(),
+        hiHatOpen: hiHatOpen.play(),
+        snare: snare.play(),
+        ride: ride.play()
+      }
+
+      this.setState({ drumSet: drumSet })
     }).catch(err => {
       console.log('err', err)
     })
@@ -99,6 +134,7 @@ export default class TestTButtons extends React.Component {
             })
           }
           <button className="btn" onClick={this.playDrums.bind(this)}>Drums</button>
+          <button className="btn" onClick={this.stopDrums.bind(this)}>Stop Drums</button>
         </div>
       </div>
     )
