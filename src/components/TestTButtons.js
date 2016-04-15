@@ -97,22 +97,46 @@ export default class TestTButtons extends React.Component {
     const promises = drumSetAudioFiles.map(file => T('audio').loadthis(file))
 
     Promise.all(promises).then(res => {
-      const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = res
+      console.log('res', res)
+      const res2 = res.map(i => i.play())
+      const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = res2
+
+      console.log('res2', res2)
 
       // TODO: find out a way to make it play() so it starts, 
       // but not actually produce sound
       const drumSet = {
-        bassDrum: bassDrum.play(),
-        hiHatClosed: hiHatClosed.play(),
-        hiHatOpen: hiHatOpen.play(),
-        snare: snare.play(),
-        ride: ride.play()
+        bassDrum: bassDrum,
+        hiHatClosed: hiHatClosed,
+        hiHatOpen: hiHatOpen,
+        snare: snare,
+        ride: ride
       }
 
-      this.setState({ drumSet: drumSet })
+      this.setState({ drumSet: drumSet, drumSetArr: res2 })
     }).catch(err => {
       console.log('err', err)
     })
+  }
+
+  playDrumBeat(tempo, loopCount) {
+    const { drumSetArr } = this.state
+    if (!drumSetArr) return
+    const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = drumSetArr
+
+    tempo = 180
+    loopCount = 4
+
+    const timeOut = 60/tempo * 1000
+    let loopPlayCount = 2
+
+    playMeasure(sampleDrumMeasure, drumSetArr, timeOut)
+    const interval = setInterval(() => {
+      if (loopPlayCount === loopCount) clearInterval(interval)
+      playMeasure(sampleDrumMeasure, drumSetArr, timeOut)
+      loopPlayCount++
+    }, timeOut * sampleDrumMeasure.length)
+
   }
 
   render() {
@@ -135,10 +159,23 @@ export default class TestTButtons extends React.Component {
           }
           <button className="btn" onClick={this.playDrums.bind(this)}>Drums</button>
           <button className="btn" onClick={this.stopDrums.bind(this)}>Stop Drums</button>
+          <button className="btn" onClick={this.playDrumBeat.bind(this)}>Drum Beat</button>
         </div>
       </div>
     )
   }
+}
+
+
+function playMeasure(measure, instrument, timeOut) {
+  measure.forEach((count, index) => {
+    setTimeout(() => {
+      for (let notes of count) {
+        const [ note, velocity, noteLength ] = notes
+        instrument[note].bang()
+      }
+    }, index * timeOut)
+  })
 }
 
 /**
@@ -150,3 +187,32 @@ export default class TestTButtons extends React.Component {
 function range(start, end) {
   return Array.apply(0, Array(end)).map((element, index) => index + start)
 }
+
+// note is represented as [midi key, velocity, note length]
+const sampleMeasure = [
+  [60, 80, 0.25], 
+  [],
+  [62, 80, 0.125],
+  [64, 80, 0.125],
+  [65, 80, 0.5],
+  [],
+  [],
+  []
+]
+
+
+// 0 - bassDrum
+// 1 - hiHatClosed
+// 2 - hiHatOpen
+// 3 - snare
+// 4 - ride
+const sampleDrumMeasure = [
+  [[0, 80, 0.25], [1, 80, 0.25]],
+  [               [1, 80, 0.25]],
+  [               [1, 80, 0.25],              [3, 80, 0.25]],
+  [               [1, 80, 0.25]],
+  [               [1, 80, 0.25]],
+  [[0, 80, 0.25], [1, 80, 0.25]],
+  [               [1, 80, 0.25],               [3, 80, 0.25]],
+  [                              [2, 80, 0.25]] 
+]
