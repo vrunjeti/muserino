@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { TestTButtons } from './components'
+import { Muse } from './components'
 
 export default class App extends React.Component {
   render() {
@@ -13,7 +13,7 @@ export default class App extends React.Component {
             </div>
           </nav>
           <div className="container">
-            <TestTButtons />
+            <Muse />
           </div>
         </body>
       </div>

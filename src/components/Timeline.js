@@ -1,5 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { utils } from './../utils'
+const { range } = utils
 
 export default class Timeline extends React.Component {
   constructor(props) {
@@ -12,7 +14,7 @@ export default class Timeline extends React.Component {
         <div className="row"></div>
         <Times timeInterval={2} />
         {
-          channelData.map((channel, i) => {
+          CHANNEL_DATA.map((channel, i) => {
             const { instrument, playedMeasures, color } = channel
             return (
               <div className="row channel" key={'channel' + i}>
@@ -67,19 +69,13 @@ const Times = ({ timeInterval }) => {
   )
 }
 
-const channelData = [
+/**
+ * Dummy data containing temporary attributes of the grid view
+ * Will be populated and recalculated by the actual music in the future
+ */
+const CHANNEL_DATA = [
   { instrument: 'drums', playedMeasures: [true, true, true, true], color: '#C3DDE6' },
   { instrument: 'lead', playedMeasures: [false, true, false, true], color: '#DEC3E6' },
   { instrument: 'chords', playedMeasures: [true, true, true, true], color: '#CBE6C3' },
   { instrument: 'bass', playedMeasures: [false, false, false, false], color: '#E6CCC3' }
 ]
-
-/**
- * Returns an array with integers between start and end
- * @param  {Number} start [beginning of range]
- * @param  {Number} end   [ending of range, non inclusive]
- * @return {Array}        [array of integers from start to end]
- */
-function range(start, end) {
-  return Array.apply(0, Array(end)).map((element, index) => index + start)
-}
