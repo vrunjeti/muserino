@@ -125,19 +125,42 @@ export default class TestTButtons extends React.Component {
     if (!drumSetArr) return
     const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = drumSetArr
 
-    tempo = 180
-    loopCount = 4
-
     const timeOut = 60/tempo * 1000
-    let loopPlayCount = 2
+    let loopPlayCount = 1
 
     playDrumMeasure(sampleDrumMeasure, drumSetArr, timeOut)
     const interval = setInterval(() => {
-      if (loopPlayCount === loopCount) clearInterval(interval)
-      playDrumMeasure(sampleDrumMeasure, drumSetArr, timeOut)
-      loopPlayCount++
+      if (loopPlayCount === loopCount) {
+        clearInterval(interval)
+      } else {
+        playDrumMeasure(sampleDrumMeasure, drumSetArr, timeOut)
+        loopPlayCount++
+      }
     }, timeOut * sampleDrumMeasure.length)
+  }
 
+  playMidiTrack(tempo, loopCount) {
+    const timeOut = 60/tempo * 1000
+    let loopPlayCount = 1
+
+    playMidiMeasure(sampleLeadMeasure, timeOut)
+    const interval = setInterval(() => {
+      if (loopPlayCount >= loopCount) {
+        clearInterval(interval)
+      } else {
+        playMidiMeasure(sampleLeadMeasure, timeOut)
+        loopPlayCount++
+      }
+    }, timeOut * sampleLeadMeasure.length)
+  }
+
+  playAllChannels(tempo, loopCount) {
+    tempo = 180
+    loopCount = 4
+    const timeOut = 60/tempo * 1000
+
+    this.playDrumBeat(tempo, loopCount)
+    this.playMidiTrack(tempo, loopCount)
   }
 
   bangA4() {
@@ -146,6 +169,12 @@ export default class TestTButtons extends React.Component {
 
     console.log(tArr)
     tArr[0].bang()
+  }
+
+  playA4() {
+    const tempo = 180
+    const timeOut = 60/tempo * 1000
+    playMidiNote(69, 80, 1, timeOut)
   }
 
   render() {
@@ -170,6 +199,8 @@ export default class TestTButtons extends React.Component {
           <button className="btn" onClick={this.stopDrums.bind(this)}>Stop Drums</button>
           <button className="btn" onClick={this.playDrumBeat.bind(this)}>Drum Beat</button>
           <button className="btn" onClick={this.bangA4.bind(this)}>Bang A4</button>
+          <button className="btn" onClick={this.playA4.bind(this)}>Play A4</button>
+          <button className="btn" onClick={this.playAllChannels.bind(this)}>Play All</button>
         </div>
         <Timeline />
       </div>
@@ -184,6 +215,7 @@ function convertMidiToFreq(midiNoteNumber) {
 }
 
 function playDrumMeasure(measure, instrument, timeOut) {
+  console.log('drum measure', measure)
   measure.forEach((count, index) => {
     setTimeout(() => {
       for (let notes of count) {
@@ -192,6 +224,37 @@ function playDrumMeasure(measure, instrument, timeOut) {
       }
     }, index * timeOut)
   })
+}
+
+function playMidiMeasure(measure, timeOut) {
+  // const tempo = 120
+  // timeOut = 60/tempo * 1000
+  console.log('timeOut', timeOut)
+  console.log('midi measure', measure)
+
+  measure.forEach((count, index) => {
+    console.log('count', count)
+    setTimeout(() => {
+      if (count[0].length) {
+        for (let notes of count) {
+          console.log('notes', notes)
+          const [ midiNoteNumber, velocity, noteLength ] = notes
+          playMidiNote(midiNoteNumber, velocity, noteLength, timeOut)
+        }
+      }
+    }, index * timeOut)
+  })
+}
+
+function playMidiNote(midiNoteNumber, velocity, duration, timeOut) {
+  const freq = convertMidiToFreq(midiNoteNumber)
+  const note = T('sin', { freq: freq, mul: velocity/100 })
+  duration = timeOut * duration
+
+  note.play()
+  setTimeout(() => {
+    note.pause()
+  }, duration)
 }
 
 /**
@@ -205,17 +268,16 @@ function range(start, end) {
 }
 
 // note is represented as [midi key, velocity, note length]
-const sampleMeasure = [
-  [60, 80, 0.25], 
-  [],
-  [62, 80, 0.125],
-  [64, 80, 0.125],
-  [65, 80, 0.5],
-  [],
-  [],
-  []
+const sampleLeadMeasure = [
+  [[60, 80, 0.25]], 
+  [[]],
+  [[62, 80, 0.125]],
+  [[64, 80, 0.125]],
+  [[65, 80, 0.5]],
+  [[]],
+  [[]],
+  [[]]
 ]
-
 
 // 0 - bassDrum
 // 1 - hiHatClosed
