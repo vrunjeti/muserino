@@ -71,7 +71,7 @@ const channelData = [
   { instrument: 'drums', playedMeasures: [true, true, true, true], color: '#C3DDE6' },
   { instrument: 'lead', playedMeasures: [false, true, false, true], color: '#DEC3E6' },
   { instrument: 'chords', playedMeasures: [true, true, true, true], color: '#CBE6C3' },
-  { instrument: 'bass', playedMeasures: [false, true, true, true], color: '#E6CCC3' }
+  { instrument: 'bass', playedMeasures: [false, false, false, false], color: '#E6CCC3' }
 ]
 
 /**

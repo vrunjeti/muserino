@@ -143,13 +143,37 @@ export default class TestTButtons extends React.Component {
     const timeOut = 60/tempo * 1000
     let loopPlayCount = 1
 
-    playMidiMeasure(sampleLeadMeasure, timeOut)
+    // playMidiMeasure(sampleLeadMeasure, timeOut, false)
     const interval = setInterval(() => {
       if (loopPlayCount >= loopCount) {
         clearInterval(interval)
       } else {
-        playMidiMeasure(sampleLeadMeasure, timeOut)
+        if (loopPlayCount % 2) {
+          playMidiMeasure('tri', sampleLeadMeasure, timeOut, false)
+        }
         loopPlayCount++
+      }
+    }, timeOut * sampleLeadMeasure.length)
+  }
+
+  playChords(tempo, loopCount) {
+    const timeOut = 60/tempo * 1000
+    let loopPlayCount = 1
+
+    const chords = [
+      sampleChordMeasure1,
+      sampleChordMeasure2,
+      sampleChordMeasure3,
+      sampleChordMeasure4
+    ]
+
+    playMidiMeasure('sin', chords[loopPlayCount-1], timeOut, true)
+    const interval = setInterval(() => {
+      if (loopPlayCount >= loopCount) {
+        clearInterval(interval)
+      } else {
+        loopPlayCount++
+        playMidiMeasure('sin', chords[loopPlayCount-1], timeOut, true)
       }
     }, timeOut * sampleLeadMeasure.length)
   }
@@ -161,6 +185,7 @@ export default class TestTButtons extends React.Component {
 
     this.playDrumBeat(tempo, loopCount)
     this.playMidiTrack(tempo, loopCount)
+    this.playChords(tempo, loopCount)
   }
 
   bangA4() {
@@ -174,7 +199,7 @@ export default class TestTButtons extends React.Component {
   playA4() {
     const tempo = 180
     const timeOut = 60/tempo * 1000
-    playMidiNote(69, 80, 1, timeOut)
+    playMidiNote('sin', 69, 80, 1, timeOut)
   }
 
   render() {
@@ -226,7 +251,7 @@ function playDrumMeasure(measure, instrument, timeOut) {
   })
 }
 
-function playMidiMeasure(measure, timeOut) {
+function playMidiMeasure(type, measure, timeOut, isChord) {
   // const tempo = 120
   // timeOut = 60/tempo * 1000
   console.log('timeOut', timeOut)
@@ -239,17 +264,20 @@ function playMidiMeasure(measure, timeOut) {
         for (let notes of count) {
           console.log('notes', notes)
           const [ midiNoteNumber, velocity, noteLength ] = notes
-          playMidiNote(midiNoteNumber, velocity, noteLength, timeOut)
+          playMidiNote(type, midiNoteNumber, velocity, noteLength, timeOut, isChord)
         }
       }
     }, index * timeOut)
   })
 }
 
-function playMidiNote(midiNoteNumber, velocity, duration, timeOut) {
-  const freq = convertMidiToFreq(midiNoteNumber)
-  const note = T('sin', { freq: freq, mul: velocity/100 })
-  duration = timeOut * duration
+function playMidiNote(type, midiNoteNumber, velocity, duration, timeOut, isChord) {
+  let freq = convertMidiToFreq(midiNoteNumber)
+  // temporary hack because notes were an octave too low 
+  // and i dont wanna manually change every note
+  freq = freq *= 2
+  const note = T('osc', { wave: type, freq: freq, mul: velocity/100 })
+  duration = timeOut * duration * 2
 
   note.play()
   setTimeout(() => {
@@ -269,11 +297,66 @@ function range(start, end) {
 
 // note is represented as [midi key, velocity, note length]
 const sampleLeadMeasure = [
-  [[60, 80, 0.25]], 
+  [[60, 100, 0.25]], 
   [[]],
-  [[62, 80, 0.125]],
-  [[64, 80, 0.125]],
-  [[65, 80, 0.5]],
+  [[62, 100, 0.125]],
+  [[64, 100, 0.125]],
+  [[65, 100, 0.5]],
+  [[]],
+  [[]],
+  [[]]
+]
+
+const emptyMeasure = [
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]]
+]
+
+const sampleChordMeasure1 = [
+  [[48, 20, 4], [52, 20, 4], [55, 20, 4]], 
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]]
+]
+
+const sampleChordMeasure2 = [
+  [[43, 20, 4], [47, 20, 4], [50, 20, 4]], 
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]]
+]
+
+const sampleChordMeasure3 = [
+  [[45, 20, 4], [48, 20, 4], [52, 20, 4]], 
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]],
+  [[]]
+]
+
+const sampleChordMeasure4 = [
+  [[41, 20, 4], [45, 20, 4], [48, 20, 4]], 
+  [[]],
+  [[]],
+  [[]],
+  [[]],
   [[]],
   [[]],
   [[]]
