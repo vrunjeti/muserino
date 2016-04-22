@@ -77,8 +77,21 @@ function major_chord_to_minor(symbol) {
 }
 
 // Returns the MIDI note number for a given note name (e.g. "C#4")
-function note_number(note) {
-  // TODO: magic regex
+function note_number(input_note) {
+  try {
+    input_note = input_note[0].toUpperCase() + input_note.slice(1)
+    let [_, note, octave] = input_note.match(/^([A-Z][b#]?)(\d+)$/)
+
+    if (Object.keys(note_remap).includes(note)) {
+      note = note_remap[note]
+    }
+
+    const position_in_octave = keys_in_octave.indexOf(note)
+    return (Math.floor(octave) + 2) * 12 + position_in_octave
+  }
+  catch (e) {
+    console.log(`Bad note input to note_number ${input_note}`)
+  }
 }
 
 // Generates a sequence of MIDI note numbers for a scale (do re mi fa sol la
@@ -177,8 +190,8 @@ function generate_melody(key, progression, progression_repeats, major=true) {
         out.push([selectWithProbability(select_from, select_from_probabilites), 80, note_val])
         last_played = last(out)[0]
 
-        // out = out.concat(range(0, Math.round((note_val/0.125) - 1)).map(i => []))
-        for (_ of range(0, Math.round((note_val/0.125) - 1)) {
+        // out = out.concat(range(0, Math.floor((note_val/0.125) - 1)).map(i => []))
+        for (_ of range(0, Math.floor((note_val/0.125) - 1)) {
           out.push([])
         }
 
