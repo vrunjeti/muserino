@@ -210,15 +210,60 @@ function generate_melody(key, progression, progression_repeats, major=true) {
   return out
 }
 
-// function play_progression(...args) {
-//   for (chord of args) {
-//     for (note of get_chord(chord, note_number('C5'))) {
-//       // play
-//     }
-//   }
-// }
+function generate(tempo, major=true, swing=false) {
+  tempo = getRandomInt(100, 200)
+  const seconds_per_beat = 60/tempo
+  const key = keys_in_octave[getRandomInt(0, keys_in_octave.length - 1)]
+
+  // create verse
+  const verse_progression = generate_progression(4, major)
+
+  let verse_chords = []
+  for (let _ of range(0, 4)) {
+    for (let chord of verse_progression) {
+      verse_chords.push([get_chord(chord, note_number(key + '2')), 80, 1])
+      verse_chords = verse_chords.concat(range(0, 7).map(_ => []))
+      // verse_chords = verse_chords.concat(Array(7).fill([]))
+      // verse_chords.push(...(range(0, 7).map(_ => [])))
+    }
+  }
+
+  let verse_rhythm_chords = []
+  for (let _ of range(0, 4)) {
+    for (let chord of verse_progression) {
+      const note = [get_chord(chord, note_number(key + '2')), 80, 0.125]
+      verse_rhythm_chords = verse_rhythm_chords.concat(Array(8).fill(note))
+    }
+  }
+
+  let verse_arp = []
+  for (let _ of range(0, 4)) {
+    for (let chord of verse_progression) {
+      const chord_notes = get_chord(chord, note_number(key + '2'))
+      const it = chord_notes.length === 3 ? chord_notes.concat(chord_notes[1]) : chord_notes
+      for (let note of it) {
+        verse_arp.push([note, 80, 0.25])
+        verse_arp.push([])
+      }
+    }
+  }
+
+  return {
+    verse_chords: verse_chords,
+    verse_rhythm_chords: verse_rhythm_chords,
+    verse_arp: verse_arp
+  }
+
+  // TODO: drums
+  
+  // TODO: create chorus
+  
+
+}
 
 export default {
   get_chord,
-  note_number
+  note_number,
+  generate_progression,
+  generate
 }
