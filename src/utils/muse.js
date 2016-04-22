@@ -1,4 +1,8 @@
-import { range, getRandomInt, last, sum, setDifference } from './utils'
+import U from './utils'
+
+const { range, getRandomInt, last, sum, setDifference, selectWithProbability } = U
+
+// console.log(range)
 
 // Standard notes in an octave
 const keys_in_octave = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -130,7 +134,7 @@ function generate_progression(bars, major=true, seed) {
   const randIndex = getRandomInt(0, Object.keys(transitions).length - 1)
   let progression = []
   progression[0] = seed ? pick_next_chord(seed, transitions) : Object.keys(transitions)[randIndex]
-  for (_ of range(0, bars - 1)) {
+  for (let _ of range(0, bars - 1)) {
     progression.push(pick_next_chord(last(progression), transitions))
   }
   return progression
@@ -140,7 +144,7 @@ function generate_progression(bars, major=true, seed) {
 // chord progression, and whether or not the key is a major key.
 function generate_melody(key, progression, progression_repeats, major=true) {
   let out = []
-  for (_ of range(0, progression_repeats)) {
+  for (let _ of range(0, progression_repeats)) {
     // Number of measures that have been generated so far
     let time_used = 0
     progression.forEach((chord, i) => {
@@ -187,11 +191,15 @@ function generate_melody(key, progression, progression_repeats, major=true) {
         // normalize select_from_probabilites probabilites
         select_from_probabilites = select_from_probabilites.map(p => p * 1/sum(select_from_probabilites))
 
-        out.push([selectWithProbability(select_from, select_from_probabilites), 80, note_val])
+        out.push([
+          selectWithProbability(select_from, select_from_probabilites),
+          80,
+          note_val
+        ])
         last_played = last(out)[0]
 
         // out = out.concat(range(0, Math.floor((note_val/0.125) - 1)).map(i => []))
-        for (_ of range(0, Math.floor((note_val/0.125) - 1)) {
+        for (let _ of range(0, Math.floor((note_val/0.125) - 1))) {
           out.push([])
         }
 
@@ -200,4 +208,17 @@ function generate_melody(key, progression, progression_repeats, major=true) {
     })
   }
   return out
+}
+
+// function play_progression(...args) {
+//   for (chord of args) {
+//     for (note of get_chord(chord, note_number('C5'))) {
+//       // play
+//     }
+//   }
+// }
+
+export default {
+  get_chord,
+  note_number
 }

@@ -2,7 +2,9 @@ import React from 'react'
 import { render } from 'react-dom'
 import request from 'superagent'
 import { Timeline } from './'
-import { sampleMeasures, utils } from './../utils'
+import { sampleMeasures, utils, MuseGen as M } from './../utils'
+
+console.log(utils)
 
 const { convertMidiToFreq } = utils
 let T = window.T
@@ -13,6 +15,7 @@ export default class Muse extends React.Component {
     super()
     this.state = { drumSetArr: [] }
     this.playAllChannels = this.playAllChannels.bind(this)
+    this.playMuse = this.playMuse.bind(this)
   }
 
   componentDidMount() {
@@ -123,14 +126,7 @@ export default class Muse extends React.Component {
    * @param  {Number} loopCount [number of times to repeat this measure]
    * @param  {String} waveType  [wave type for Timbre oscillator]
    */
-  playChords(timeOut, loopCount, waveType) {
-    const chords = [
-      sampleMeasures.CHORD_1,
-      sampleMeasures.CHORD_2,
-      sampleMeasures.CHORD_3,
-      sampleMeasures.CHORD_4
-    ]
-
+  playChords(chords, timeOut, loopCount, waveType) {
     // call playMeasure immediately at first 
     // since code inside setTnterval starts with the delay (second measure)
     // set loopPlayCount to 1 to account for this
@@ -158,9 +154,33 @@ export default class Muse extends React.Component {
     loopCount = 4
     const timeOut = 60/tempo * 1000
 
+    const chords = [
+      sampleMeasures.CHORD_1,
+      sampleMeasures.CHORD_2,
+      sampleMeasures.CHORD_3,
+      sampleMeasures.CHORD_4
+    ]
+
     this.playDrumBeat(sampleMeasures.DRUMS, timeOut, loopCount)
     this.playMidiTrack(sampleMeasures.LEAD, timeOut, loopCount, 'tri')
-    this.playChords(timeOut, loopCount, 'sin')
+    this.playChords(chords, timeOut, loopCount, 'sin')
+  }
+
+  playMuse() {
+    const tempo = 120
+    const loopCount = 4
+    const timeOut = 60/tempo * 1000
+
+    // const args = ['iii', 'vi', 'ii', 'V']
+    const args = ['iii']
+    for (let chord of args) {
+      const merp =  M.get_chord(chord, M.note_number('A3'))
+      console.log(merp)
+      // playMidiNote('sin', merp[2], 80, 1, timeOut)
+      for (let note of M.get_chord(chord, M.note_number('A3'))) {
+        playMidiNote('sin', note, 80, 1, timeOut)
+      }
+    }
   }
 
   render() {
@@ -168,7 +188,8 @@ export default class Muse extends React.Component {
       <div>
         <div className="row"></div>
         <div className="row">
-          <button className="btn" onClick={this.playAllChannels}>Play</button>
+          <button className="btn" onClick={this.playAllChannels}>Play Sample</button>
+          <button className="btn" onClick={this.playMuse}>MUSE ME</button>
         </div>
         <Timeline />
       </div>
@@ -222,7 +243,7 @@ function playMidiNote(waveType, midiNoteNumber, velocity, duration, timeOut) {
 
   // temporary hack because notes were an octave too low 
   // and I don't want to manually change every note
-  freq = freq *= 2
+  // freq = freq *= 2
 
   const note = T('osc', { wave: waveType, freq: freq, mul: velocity/100 })
 
