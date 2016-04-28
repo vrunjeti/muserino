@@ -45,7 +45,7 @@ export default class Muse extends React.Component {
 
     const promises = drumSetAudioFiles.map(file => T('audio').loadthis(file))
     Promise.all(promises).then(res => {
-      // TODO: find out a way to make it play() so it starts, 
+      // TODO: find out a way to make it play() so it starts,
       // but not actually produce sound
       const drumSetArr = res.map(i => i.play())
       const [ bassDrum, hiHatClosed, hiHatOpen, snare, ride ] = drumSetArr
@@ -66,7 +66,7 @@ export default class Muse extends React.Component {
 
   /**
    * Plays the given drum beat loopCount times
-   * 
+   *
    * @param  {Array}  drumBeat  [array of notes representing a measure of a drum beat]
    * @param  {Number} timeOut   [intermediate configuration number for timing intervals]
    * @param  {Number} loopCount [number of times to repeat this measure]
@@ -75,7 +75,7 @@ export default class Muse extends React.Component {
     const { drumSetArr } = this.state
     if (!drumSetArr) return
 
-    // call playMeasure immediately at first 
+    // call playMeasure immediately at first
     // since code inside setTnterval starts with the delay (second measure)
     // set loopPlayCount to 1 to account for this
     let loopPlayCount = 1
@@ -93,15 +93,15 @@ export default class Muse extends React.Component {
 
   /**
    * Plays the given midi measure loopCount times
-   * 
+   *
    * @param  {Array}  measure   [array of notes representing a measure of a midi sequence]
    * @param  {Number} timeOut   [intermediate configuration number for timing intervals]
    * @param  {Number} loopCount [number of times to repeat this measure]
    * @param  {String} waveType  [wave type for Timbre oscillator]
    */
   playMidiTrack(measure, timeOut, loopCount, waveType) {
-    
-    // call playMeasure immediately at first 
+
+    // call playMeasure immediately at first
     // since code inside setTnterval starts with the delay (second measure)
     // set loopPlayCount to 1 to account for this
     let loopPlayCount = 1
@@ -121,13 +121,13 @@ export default class Muse extends React.Component {
 
   /**
    * Plays the given chord progression
-   * 
+   *
    * @param  {Number} timeOut   [intermediate configuration number for timing intervals]
    * @param  {Number} loopCount [number of times to repeat this measure]
    * @param  {String} waveType  [wave type for Timbre oscillator]
    */
   playChords(chords, timeOut, loopCount, waveType) {
-    // call playMeasure immediately at first 
+    // call playMeasure immediately at first
     // since code inside setTnterval starts with the delay (second measure)
     // set loopPlayCount to 1 to account for this
     let loopPlayCount = 1
@@ -145,7 +145,7 @@ export default class Muse extends React.Component {
 
   /**
    * Plays all the channels (drums, lead, chords)
-   * 
+   *
    * @param  {Number} tempo     [beats per minute (bpm) of song to be played]
    * @param  {Number} loopCount [number of measures to play]
    */
@@ -202,7 +202,7 @@ export default class Muse extends React.Component {
 /**
  * Plays a measure of a given midi sequence
  * Handles setting timeouts/intervals with the help of the timeOut param
- * 
+ *
  * @param  {String} measureType  [specificies whether the measure is drums or midi]
  * @param  {Array}  measure      [array of notes representing a measure of a midi sequence]
  * @param  {Number} timeOut      [intermediate configuration number for timing intervals]
@@ -213,7 +213,7 @@ function playMeasure(measureType, measure, timeOut, waveType, drumSet) {
   console.log(measureType, 'measure', measure)
 
   measure.forEach((count, index) => {
-    // count refers to the current eighth note in the measure, 
+    // count refers to the current eighth note in the measure,
     // aka the offset from the beginning of the measure
     setTimeout(() => {
       if (count[0].length) {
@@ -233,7 +233,7 @@ function playMeasure(measureType, measure, timeOut, waveType, drumSet) {
 
 /**
  * Plays a midi note using a Timbre oscillator
- * 
+ *
  * @param  {String} waveType       [wave type for Timbre oscillator]
  * @param  {Number} midiNoteNumber [number of midi note representing its pitch]
  * @param  {Number} velocity       [Intensity of note (loudness)]
@@ -243,7 +243,7 @@ function playMeasure(measureType, measure, timeOut, waveType, drumSet) {
 function playMidiNote(waveType, midiNoteNumber, velocity, duration, timeOut) {
   let freq = convertMidiToFreq(midiNoteNumber)
 
-  // temporary hack because notes were an octave too low 
+  // temporary hack because notes were an octave too low
   // and I don't want to manually change every note
   // freq = freq *= 2
 

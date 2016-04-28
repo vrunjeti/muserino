@@ -2,7 +2,11 @@ import U from './utils'
 
 const { range, getRandomInt, last, sum, setDifference, selectWithProbability } = U
 
-// console.log(range)
+ const BASS_DRUM_NUMBER = 0
+ const HI_HAT_CLOSED_NUMBER = 1
+ const HI_HAT_OPEN_NUMBER = 2
+ const SNARE_DRUM_NUMBER = 3
+ const RIDE_NUMBER = 4
 
 // Standard notes in an octave
 const keys_in_octave = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -83,6 +87,8 @@ function major_chord_to_minor(symbol) {
 // Returns the MIDI note number for a given note name (e.g. "C#4")
 function note_number(input_note) {
   try {
+    // only capitalize the first letter since otherwise
+    // 'b' for flats will be capitalized and won't match regex
     input_note = input_note[0].toUpperCase() + input_note.slice(1)
     let [_, note, octave] = input_note.match(/^([A-Z][b#]?)(\d+)$/)
 
@@ -225,6 +231,7 @@ function generate(tempo, major=true, swing=false) {
       verse_chords = verse_chords.concat(range(0, 7).map(_ => []))
       // verse_chords = verse_chords.concat(Array(7).fill([]))
       // verse_chords.push(...(range(0, 7).map(_ => [])))
+      // verse_chords.push(...Array(7).fill([]))
     }
   }
 
@@ -248,16 +255,149 @@ function generate(tempo, major=true, swing=false) {
     }
   }
 
+  const ghost_note_penalty = 1
+  let snare = range(0, 8).map(_ => {
+    if (Math.floor(getRandomInt(0, ghost_note_penalty) * 1/ghost_note_penalty)) {
+      return getRandomInt(20, 50)
+    } else {
+      return 0
+    }
+  })
+  // backbeat
+  snare[2] = 60
+  snare[6] = 60
+
+  let bass = range(0, 8).map(i => {
+    const rand = Math.floor(getRandomInt(0, 2 * ghost_note_penalty)/(2 * ghost_note_penalty))
+    if (rand && !range(2, 6).includes(i)) {
+      return getRandomInt(30, 80)
+    } else {
+      return 0
+    }
+  })
+
+  let verse_snare = []
+  for (let _ of range(0, 16)) {
+    const measure = snare.map(hit => hit ? [SNARE_DRUM_NUMBER, hit, 0.03] : [])
+    verse_snare.push(...measure)
+  }
+
+  let verse_bass = []
+  for (let _ of range(0, 16)) {
+    const measure = bass.map(hit => hit ? [BASS_DRUM_NUMBER, hit, 0.03] : [])
+    verse_bass.push(...measure)
+  }
+
+  let verse_hihat = []
+  if (getRandomInt(0, 1)) {
+    for (let _ of range(0, 64)) {
+      const hits = [[HI_HAT_CLOSED_NUMBER, 70, 0.3], [HI_HAT_CLOSED_NUMBER, 40, 0.3]]
+      verse_hihat.push(...hits)
+    }
+  } else {
+    for (let _ of range(0, 128)) {
+      verse_hihat.push([])
+    }
+  }
+
+  // either 2 or 4
+  let melody_repeats = getRandomInt(0, 1) === 0 ? 2 : 4
+
+  let verse_melody = generate_melody(key, verse_progression, melody_repeats, major)
+  if (melody_repeats === 2) {
+    verse_melody.push(...verse_melody)
+  }
+
+
+  let chorus_progression = generate_progression(4, major, last(verse_progression))
+
+  let chorus_chords = []
+  for (let _ of range(0, 4)) {
+    for (let chord of chorus_progression) {
+      chorus_chords.push([get_chord(chord, note_number(key + '2')), 80, 1])
+      chorus_chords.push(...Array(7).fill([]))
+    }
+  }
+
+  let chorus_arp = []
+  for (let _ of range(0, 4)) {
+    for (let chord of chorus_progression) {
+      const notes = get_chord(chord, note_number(key + '2'))
+      const it = notes.length === 3 ? notes.concat(notes[3]) : notes
+      for (let note of it) {
+        chorus_arp.push([note, 80, 0.25])
+        chorus_arp.push([])
+      }
+    }
+  }
+
+  let c_snare = range(0, 8).map(_ => {
+    if (Math.floor(getRandomInt(0, ghost_note_penalty) * 1/ghost_note_penalty)) {
+      return getRandomInt(20, 50)
+    } else {
+      return 0
+    }
+  })
+  // backbeat
+  c_snare[2] = 60
+  c_snare[6] = 60
+
+  let c_bass = range(0, 8).map(i => {
+    const rand = Math.floor(getRandomInt(0, 2 * ghost_note_penalty)/(2 * ghost_note_penalty))
+    if (rand && !range(2, 6).includes(i)) {
+      return getRandomInt(30, 80)
+    } else {
+      return 0
+    }
+  })
+
+  let chorus_snare = []
+  for (let _ of range(0, 16)) {
+    const measure = c_snare.map(hit => hit ? [SNARE_DRUM_NUMBER, hit, 0.03] : [])
+    chorus_snare.push(...measure)
+  }
+
+  let chorus_bass = []
+  for (let _ of range(0, 16)) {
+    const measure = c_bass.map(hit => hit ? [BASS_DRUM_NUMBER, hit, 0.03] : [])
+    chorus_bass.push(...measure)
+  }
+
+  let chorus_hihat = []
+  if (getRandomInt(0, 1)) {
+    for (let _ of range(0, 64)) {
+      const hits = [[HI_HAT_CLOSED_NUMBER, 70, 0.3], [HI_HAT_CLOSED_NUMBER, 40, 0.3]]
+      chorus_hihat.push(...hits)
+    }
+  } else {
+    for (let _ of range(0, 128)) {
+      chorus_hihat.push([])
+    }
+  }
+
+  // either 2 or 4
+  let c_melody_repeats = getRandomInt(0, 1) === 0 ? 2 : 4
+
+  let chorus_melody = generate_melody(key, verse_progression, c_melody_repeats, major)
+  if (c_melody_repeats === 2) {
+    chorus_melody.push(...chorus_melody)
+  }
+
   return {
     verse_chords: verse_chords,
     verse_rhythm_chords: verse_rhythm_chords,
-    verse_arp: verse_arp
+    verse_arp: verse_arp,
+    verse_snare: verse_snare,
+    verse_bass: verse_bass,
+    verse_hihat: verse_hihat,
+    verse_melody: verse_melody,
+    chorus_chords: chorus_chords,
+    chorus_arp: chorus_arp,
+    chorus_snare: chorus_snare,
+    chorus_bass: chorus_bass,
+    chorus_hihat: chorus_hihat,
+    chorus_melody: chorus_melody
   }
-
-  // TODO: drums
-  
-  // TODO: create chorus
-  
 
 }
 

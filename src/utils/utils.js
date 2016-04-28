@@ -21,6 +21,9 @@ function convertMidiToFreq(midiNoteNumber) {
   return Math.pow(2, (midiNoteNumber - 69)/12) * A4
 }
 
+/**
+ * Returns a random number between min and max
+ */
 function randomRange(min, max) {
   return Math.random() * (max - min) + min
 }
@@ -32,10 +35,16 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+/**
+ * Calculates the sum of all elements in an array
+ */
 function sum(arr) {
   return arr.reduce((acc, curr) => acc + curr)
 }
 
+/**
+ * Returns the last element in an array
+ */
 function last(arr) {
   return arr[arr.length - 1]
 }
@@ -53,22 +62,34 @@ function selectWithProbability(options, probabilities) {
   }
 }
 
+/**
+ * Calulates the set of an array and returns it back as an array
+ */
 function set(arr) {
   return [...new Set(arr)]
 }
 
+/**
+ * Performs a set union on setA and setB
+ */
 function setUnion(setA, setB) {
   if (Array.isArray(setA)) setA = new Set(setA)
   if (Array.isArray(setB)) setB = new Set(setB)
   return new Set([...setA, ...setB])
 }
 
+/**
+ * Performs a set intersection on setA and setB
+ */
 function setIntersection(setA, setB) {
   if (Array.isArray(setA)) setA = new Set(setA)
   if (Array.isArray(setB)) setB = new Set(setB)
   return new Set([...setA].filter(el => setB.has(el)))
 }
 
+/**
+ * Performs a set difference on setA and setB
+ */
 function setDifference(setA, setB) {
   if (Array.isArray(setA)) setA = new Set(setA)
   if (Array.isArray(setB)) setB = new Set(setB)
