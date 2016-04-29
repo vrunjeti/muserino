@@ -1,3 +1,5 @@
+import { setUnion, setIntersection, setDifference } from './set'
+
 /**
  * Returns an array with integers between start and end
  *
@@ -36,9 +38,12 @@ function getRandomInt(min, max) {
 }
 
 /**
- * Calculates the sum of all elements in an array
+ * Calculates the sum of all arguments.
+ * This accepts any number of parameters of type Number, or an array of Numbers
  */
-function sum(arr) {
+function sum(...arr) {
+  // if argument is given as an array, keep it as an array
+  if (Array.isArray(arr[0])) arr = arr[0]
   return arr.reduce((acc, curr) => acc + curr)
 }
 
@@ -69,40 +74,6 @@ function selectWithProbability(options, probabilities) {
   }
   console.log('ret', ret)
   return ret
-}
-
-/**
- * Calulates the set of an array and returns it back as an array
- */
-function set(arr) {
-  return [...new Set(arr)]
-}
-
-/**
- * Performs a set union on setA and setB
- */
-function setUnion(setA, setB) {
-  if (Array.isArray(setA)) setA = new Set(setA)
-  if (Array.isArray(setB)) setB = new Set(setB)
-  return new Set([...setA, ...setB])
-}
-
-/**
- * Performs a set intersection on setA and setB
- */
-function setIntersection(setA, setB) {
-  if (Array.isArray(setA)) setA = new Set(setA)
-  if (Array.isArray(setB)) setB = new Set(setB)
-  return new Set([...setA].filter(el => setB.has(el)))
-}
-
-/**
- * Performs a set difference on setA and setB
- */
-function setDifference(setA, setB) {
-  if (Array.isArray(setA)) setA = new Set(setA)
-  if (Array.isArray(setB)) setB = new Set(setB)
-  return new Set([...setA].filter(el => !setB.has(el)))
 }
 
 export default {

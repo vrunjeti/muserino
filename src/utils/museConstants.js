@@ -6,7 +6,6 @@ export const RIDE_NUMBER = 4
 
 export const GHOST_NOTE_PENALTY = 1
 
-
 // Standard notes in an octave
 export const KEYS_IN_OCTAVE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
@@ -40,6 +39,7 @@ export const TRANSITIONS_MAJOR = {
   'vi': ['ii', 'IV', 'V'],
   'vii0': ['I']
 }
+
 export const TRANSITIONS_MINOR = {
   'i': ['i', 'ii0', 'III', 'iv', 'V', 'VI', 'VII', 'vii0'],
   'ii0': ['V', 'vii0'],
@@ -66,6 +66,7 @@ export const TRIAD_NOTES = {
   'ii0': [1, 4, 7, 9],
   'vii0': [0, 4, 7, 10]
 }
+
 TRIAD_NOTES['i'] = major_chord_to_minor('I')
 TRIAD_NOTES['ii'] = major_chord_to_minor('II')
 TRIAD_NOTES['iii'] = major_chord_to_minor('III')
