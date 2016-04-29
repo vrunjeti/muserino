@@ -155,6 +155,12 @@ function generate_melody(key, progression, progression_repeats, major=true) {
   return out
 }
 
+/**
+ * Generates the notes for the chords section of the song
+ * @param  {[String]} progression [list of chords independent of scale]
+ * @param  {String}   key         [specifies the scale]
+ * @return {[Array]}              [notes for the chord section]
+ */
 function make_chords(progression, key) {
   let chords = []
   for (let _ of range(0, 4)) {
@@ -166,6 +172,12 @@ function make_chords(progression, key) {
   return chords
 }
 
+/**
+ * Generates the notes for the rhythm chords section of the song
+ * @param  {[String]} progression [list of chords independent of scale]
+ * @param  {String}   key         [specifies the scale]
+ * @return {[Array]}              [notes for the rhythm chord section]
+ */
 function make_rhythm_chords(progression, key) {
   let rhythm_chords = []
   for (let _ of range(0, 4)) {
@@ -177,6 +189,12 @@ function make_rhythm_chords(progression, key) {
   return rhythm_chords
 }
 
+/**
+ * Generates an arpeggio, used for the bass instrument
+ * @param  {[String]} progression [list of chords independent of scale]
+ * @param  {String}   key         [specifies the scale]
+ * @return {[Array]}              [notes for the arpeggio section]
+ */
 function make_arpeggio(progression, key) {
   let arpeggio = []
   for (let _ of range(0, 4)) {
@@ -192,6 +210,10 @@ function make_arpeggio(progression, key) {
   return arpeggio
 }
 
+/**
+ * Generates a line for the snare
+ * @return {[Number]} [notes for a snare line]
+ */
 function make_snare_line() {
   let snare = range(0, 8).map(_ => {
     if (Math.floor(getRandomInt(0, GHOST_NOTE_PENALTY) * 1/GHOST_NOTE_PENALTY)) {
@@ -207,6 +229,10 @@ function make_snare_line() {
   return snare
 }
 
+/**
+ * Generates a line for the bass
+ * @return {[Number]} [notes for a bass line]
+ */
 function make_bass_line() {
   let bass = range(0, 8).map(i => {
     const rand = Math.floor(getRandomInt(0, 2 * GHOST_NOTE_PENALTY)/(2 * GHOST_NOTE_PENALTY))
@@ -219,6 +245,12 @@ function make_bass_line() {
   return bass
 }
 
+/**
+ * Generates the notes for the snare or bass drum section
+ * @param  {String}   type [either 'snare' or 'bass', specifies which type of drum]
+ * @param  {[Number]} line [lines that are either from make_drum_line() or make_bass_line()]
+ * @return {[Array]}       [notes for the drum section]
+ */
 function make_drums(type, line) {
   let drums = []
   for (let _ of range(0, 16)) {
@@ -229,6 +261,10 @@ function make_drums(type, line) {
   return drums
 }
 
+/**
+ * Generates the notes for the hihat
+ * @return {[Number]} [notes for the hihat section]
+ */
 function make_hihat() {
   let hihat = []
   if (getRandomInt(0, 1)) {
@@ -244,6 +280,15 @@ function make_hihat() {
   return hihat
 }
 
+/**
+ * Generates the notes for an entire section of a song
+ * @param  {String}  type  [Specifies 'verse' or 'chorus']
+ * @param  {String}  key   [current scale]
+ * @param  {Number}  bars  [number of bars/measures to generate]
+ * @param  {Boolean} major [flag for major or minor scale]
+ * @param  {Number}  seed  [note to determine next chord in progression]
+ * @return {Object}        [object containing different channels]
+ */
 function generate_section(type, key, bars=4, major=true, seed) {
   const progression = generate_progression(4, major)
 
@@ -279,7 +324,13 @@ function generate_section(type, key, bars=4, major=true, seed) {
   return packaged_section
 }
 
-function generate(tempo=120, major=true, swing=false) {
+/**
+ * Generates all parts of the song
+ * @param  {Number}  tempo [how fast the song should be]
+ * @param  {Boolean} major [flag for major or minor scale]
+ * @return {Object}        [object containing all the parts of the song]
+ */
+function generate(tempo=120, major=true) {
   const key = KEYS_IN_OCTAVE[getRandomInt(0, KEYS_IN_OCTAVE.length - 1)]
   const verse = generate_section('verse', key, 4, major)
   const chorus = generate_section('chorus', key, 4, major, last(verse.verse_progression))
