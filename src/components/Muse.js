@@ -16,6 +16,7 @@ export default class Muse extends React.Component {
     this.state = { drumSetArr: [] }
     this.playAllChannels = this.playAllChannels.bind(this)
     this.playMuse = this.playMuse.bind(this)
+    this.generate = this.generate.bind(this)
   }
 
   componentDidMount() {
@@ -185,6 +186,15 @@ export default class Muse extends React.Component {
     this.playChords(progression3, timeOut, loopCount, 'saw')
   }
 
+  generate() {
+    const tempo = 180
+    const loopCount = 4
+    const timeOut = 60/tempo * 1000
+
+    const generated = M.generate()
+    console.log(generated)
+  }
+
   render() {
     return (
       <div>
@@ -192,6 +202,7 @@ export default class Muse extends React.Component {
         <div className="row">
           <button className="btn" onClick={this.playAllChannels}>Play Sample</button>
           <button className="btn" onClick={this.playMuse}>MUSE ME</button>
+          <button className="btn" onClick={this.generate}>MUSE MEEEE</button>
         </div>
         <Timeline />
       </div>
