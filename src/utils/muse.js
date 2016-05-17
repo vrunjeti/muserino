@@ -142,8 +142,6 @@ function generate_melody(key, progression, progression_repeats, major=true) {
         // out = out.concat(range(0, Math.floor((note_val/0.125) - 1)).map(i => []))
 
         const merppp = Math.floor((note_val/0.125) - 1)
-        console.log('note_val', note_val)
-        console.log(merppp)
         for (let _ of range(0, merppp)) {
           out.push([])
         }

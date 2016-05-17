@@ -56,24 +56,17 @@ function last(arr) {
 
 // assumes probabilities are normalized
 function selectWithProbability(options, probabilities) {
-  console.log('options', options)
-  console.log('probabilities', probabilities)
   if (options.length !== probabilities.length) {
-    console.log('noooooo')
     throw new Error('options and probabilities don\'t have the same length')
   }
   const rand = Math.random()
   let weight_sum = 0
-  let ret
   for (let i of range(0, options.length)) {
     weight_sum += probabilities[i]
     if (rand <= weight_sum) {
-      console.log('what', options[i])
-      ret = options[i]
+      return options[i]
     }
   }
-  console.log('ret', ret)
-  return ret
 }
 
 export default {
